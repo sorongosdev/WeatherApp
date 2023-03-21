@@ -1,21 +1,25 @@
 package com.sorongos.weatherapp
 
-import androidx.appcompat.app.AppCompatActivity
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.model.LatLng
 import com.sorongos.weatherapp.databinding.ActivityMainBinding
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import android.Manifest
-import com.google.android.gms.location.LocationServices
+import java.util.Objects.isNull
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-    val locationPermissionRequest = registerForActivityResult(
+    private val locationPermissionRequest = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         when {
@@ -33,10 +37,20 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        locationPermissionRequest.launch(
-            arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION)
-        )
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            locationPermissionRequest.launch(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION))
+            return
+        }
+
+        fusedLocationClient.lastLocation
+            .addOnSuccessListener { location->
+                Log.e("lastLocation",location.toString())
+            }
 
         val retrofit = Retrofit.Builder()
             .baseUrl("http://apis.data.go.kr/")
@@ -109,4 +123,5 @@ class MainActivity : AppCompatActivity() {
             else -> "해당없음"
         }
     }
+
 }
