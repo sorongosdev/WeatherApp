@@ -2,6 +2,7 @@ package com.sorongos.weatherapp
 
 import com.google.gson.annotations.SerializedName
 
+/**서버에서 온 값*/
 data class WeatherEntity(
     @SerializedName("response")
     val response: WeatherResponse
@@ -31,9 +32,12 @@ data class ForecastEntityList(
     val forecastEntities: List<ForecastEntity>
 )
 data class ForecastEntity(
-    val baseData: String,
+    @SerializedName("baseDate")
+    val baseDate: String,
+    @SerializedName("baseTime")
     val baseTime: String,
-    val category: String,
+    @SerializedName("category")
+    val category: Category?,
     @SerializedName("fcstDate")
     val forecastDate: String,
     @SerializedName("fcstTime")
