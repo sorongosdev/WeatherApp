@@ -3,19 +3,40 @@ package com.sorongos.weatherapp
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.activity.result.contract.ActivityResultContracts
 import com.sorongos.weatherapp.databinding.ActivityMainBinding
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import android.Manifest
+import com.google.android.gms.location.LocationServices
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
+    val locationPermissionRequest = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        when {
+            permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
+                // Only approximate location access granted.
+            }
+            else -> {
+                // No location access granted.
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        locationPermissionRequest.launch(
+            arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION)
+        )
+        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         val retrofit = Retrofit.Builder()
             .baseUrl("http://apis.data.go.kr/")
@@ -26,7 +47,7 @@ class MainActivity : AppCompatActivity() {
 
         val baseDateTime = BaseDateTime.getBaseDateTime()
         val converter = GeoPointConverter()
-        val point = converter.convert(lon= 126.8356,lat= 37.2974)
+        val point = converter.convert(lon = 126.8356, lat = 37.2974)
         service.getVillageForecast(
             serviceKey = "DmBM2x0wpsJXPEO9ulpEtKw6+h8WozAD6uU7ngLMtXTiJiVIC6HxK80W4DU7/S+1mHutkaHsY1h4qjg72USKEQ==",
             baseTime = baseDateTime.baseTime,
@@ -79,6 +100,7 @@ class MainActivity : AppCompatActivity() {
             else -> ""
         }
     }
+
     private fun transformSky(forecast: ForecastEntity): String {
         return when (forecast.forecastValue.toInt()) {
             1 -> "맑음"
