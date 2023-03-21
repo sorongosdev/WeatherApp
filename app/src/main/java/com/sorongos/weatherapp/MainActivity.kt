@@ -25,12 +25,14 @@ class MainActivity : AppCompatActivity() {
         val service = retrofit.create(WeatherService::class.java)
 
         val baseDateTime = BaseDateTime.getBaseDateTime()
+        val converter = GeoPointConverter()
+        val point = converter.convert(lon= 126.8356,lat= 37.2974)
         service.getVillageForecast(
             serviceKey = "DmBM2x0wpsJXPEO9ulpEtKw6+h8WozAD6uU7ngLMtXTiJiVIC6HxK80W4DU7/S+1mHutkaHsY1h4qjg72USKEQ==",
             baseTime = baseDateTime.baseTime,
             baseDate = baseDateTime.baseDate,
-            nx = 55,
-            ny = 127
+            nx = point.nx,
+            ny = point.ny
         ).enqueue(object : Callback<WeatherEntity> {
             override fun onResponse(call: Call<WeatherEntity>, response: Response<WeatherEntity>) {
                 val forecastDateTimeMap = mutableMapOf<String, Forecast>()
@@ -51,7 +53,7 @@ class MainActivity : AppCompatActivity() {
                         when (forecast.category) {
                             Category.POP -> precipitation = forecast.forecastValue.toInt()
                             Category.PTY -> precipitationType = transformRainType(forecast)
-                            Category.SKY -> transformSky(forecast)
+                            Category.SKY -> sky = transformSky(forecast)
                             Category.TMP -> temperature = forecast.forecastValue.toDouble()
                             else -> {}
                         }
@@ -82,7 +84,7 @@ class MainActivity : AppCompatActivity() {
             1 -> "맑음"
             3 -> "구름많음"
             4 -> "흐림"
-            else -> ""
+            else -> "해당없음"
         }
     }
 }
