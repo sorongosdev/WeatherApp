@@ -90,6 +90,7 @@ class MainActivity : AppCompatActivity() {
                         call: Call<WeatherEntity>,
                         response: Response<WeatherEntity>
                     ) {
+                        //String은 날짜/시간 형태임 -> 20230323/0300
                         val forecastDateTimeMap = mutableMapOf<String, Forecast>()
                         val forecastList =
                             response.body()?.response?.body?.items?.forecastEntities.orEmpty()
@@ -104,6 +105,7 @@ class MainActivity : AppCompatActivity() {
                                         forecastTime = forecast.forecastTime
                                     )
                             }
+
                             forecastDateTimeMap["${forecast.forecastDate}/${forecast.forecastTime}"]?.apply {
                                 when (forecast.category) {
                                     Category.POP -> precipitation = forecast.forecastValue.toInt()
@@ -114,6 +116,22 @@ class MainActivity : AppCompatActivity() {
                                 }
                             }
                         }
+
+                        //정렬
+                        val list = forecastDateTimeMap.values.toMutableList()
+                        list.sortWith { f1, f2 ->
+                            val f1DateTime = "${f1.forecastDate}${f1.forecastTime}"
+                            val f2DateTime = "${f2.forecastDate}${f2.forecastTime}"
+
+                            return@sortWith f1DateTime.compareTo(f2DateTime)
+                        }
+
+                        // 정렬 후 첫번째 값은 현재 것임
+                        val currentForecast = list.first()
+                        binding.temperatureTextView.text = getString(R.string.temperature_text,currentForecast.temperature)
+                        binding.skyTextView.text = currentForecast.weather
+                        binding.precipitationTextView.text = getString(R.string.precipitation_text, currentForecast.precipitation)
+
                         Log.e("Forecast", forecastDateTimeMap.toString())
                     }
 
