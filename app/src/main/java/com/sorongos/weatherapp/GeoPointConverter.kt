@@ -57,82 +57,8 @@ class GeoPointConverter {
         val nx = ra * sin(theta) + XO + 1.5
         val ny = ro - ra * cos(theta) + YO + 1.5;
 
+        Log.e("Converter","$nx $ny")
+
         return Point(nx.toInt(), ny.toInt())
-
-        /**
-
-         *x = (float)(ra*sin(theta)) + (*map).xo;
-         *y = (float)(ro - ra*cos(theta)) + (*map).yo;*/
     }
-
-/*============================================================================*
-* 좌표변환
-*============================================================================*/
-    /**
-    int map_conv
-    (
-    float *lon, // 경도(degree)
-    float *lat, // 위도(degree)
-    float *x, // X격자 (grid)
-    float *y, // Y격자 (grid)
-    int code, // 0 (격자->위경도), 1 (위경도->격자)
-    struct lamc_parameter map // 지도정보
-    ) {
-    float lon1, lat1, x1, y1;
-
-    //
-    // 위경도 -> (X,Y)
-    //
-
-    if (code == 0) {
-    lon1 = *lon;
-    lat1 = *lat;
-    lamcproj(&lon1, &lat1, &x1, &y1, 0, &map);
-     *x = (int)(x1 + 1.5);
-     *y = (int)(y1 + 1.5);
-    }
-
-    return 0;
-    }
-
-
-    int lamcproj(lon, lat, x, y, code, map)
-
-    float *lon, *lat; /* Longitude, Latitude [degree] */
-    float *x, *y; /* Coordinate in Map [grid] */
-    int code; /* (0) lon,lat ->x,y (1) x,y ->lon,lat */
-    struct lamc_parameter *map;
-    {
-    static double PI, DEGRAD, RADDEG;
-    static double re, olon, olat, sn, sf, ro;
-    double slat1, slat2, alon, alat, xn, yn, ra, theta;
-
-
-
-
-
-
-    } else {
-    xn = *x - (*map).xo;
-    yn = ro - *y + (*map).yo;
-    ra = sqrt(xn*xn+yn*yn);
-    if (sn< 0.0) -ra;
-    alat = pow((re*sf/ra),(1.0/sn));
-    alat = 2.0*atan(alat) - PI*0.5;
-    if (fabs(xn) <= 0.0) {
-    theta = 0.0;
-    } else {
-    if (fabs(yn) <= 0.0) {
-    theta = PI*0.5;
-    if(xn< 0.0 ) -theta;
-    } else
-    theta = atan2(xn,yn);
-    }
-    alon = theta/sn + olon;
-     *lat = (float)(alat*RADDEG);
-     *lon = (float)(alon*RADDEG);
-    }
-    return 0;
-    }
-     */
 }
