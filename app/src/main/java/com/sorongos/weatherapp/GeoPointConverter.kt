@@ -57,8 +57,6 @@ class GeoPointConverter {
         val nx = ra * sin(theta) + XO + 1.5
         val ny = ro - ra * cos(theta) + YO + 1.5;
 
-        Log.e("Converter","$nx $ny")
-
         return Point(nx.toInt(), ny.toInt())
 
         /**

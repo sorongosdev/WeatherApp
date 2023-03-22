@@ -7,6 +7,8 @@ import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
 import com.sorongos.weatherapp.databinding.ActivityMainBinding
@@ -19,12 +21,14 @@ import java.util.Objects.isNull
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
+    private lateinit var locationCallback: LocationCallback
+
     private val locationPermissionRequest = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         when {
             permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
-                // Only approximate location access granted.
+                updateLocation()
             }
             else -> {
                 // No location access granted.
@@ -37,20 +41,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            locationPermissionRequest.launch(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION))
-            return
-        }
-
-        fusedLocationClient.lastLocation
-            .addOnSuccessListener { location->
-                Log.e("lastLocation",location.toString())
-            }
+        locationPermissionRequest.launch(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION))
 
         val retrofit = Retrofit.Builder()
             .baseUrl("http://apis.data.go.kr/")
@@ -75,7 +66,7 @@ class MainActivity : AppCompatActivity() {
                     response.body()?.response?.body?.items?.forecastEntities.orEmpty()
 
                 for (forecast in forecastList) {
-                    Log.e("Forecast", forecast.toString())
+//                    Log.e("Forecast", forecast.toString())
 
                     if (forecastDateTimeMap["${forecast.forecastDate}/${forecast.forecastTime}"] == null) {
                         forecastDateTimeMap["${forecast.forecastDate}/${forecast.forecastTime}"] =
@@ -94,7 +85,7 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                 }
-                Log.e("Forecast", forecastDateTimeMap.toString())
+//                Log.e("Forecast", forecastDateTimeMap.toString())
             }
 
             override fun onFailure(call: Call<WeatherEntity>, t: Throwable) {
@@ -102,6 +93,23 @@ class MainActivity : AppCompatActivity() {
             }
 
         })
+    }
+
+    private fun updateLocation(){
+        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            locationPermissionRequest.launch(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION))
+            return
+        }
+
+        fusedLocationClient.lastLocation
+            .addOnSuccessListener { location->
+                Log.e("lastLocation",location.toString())
+            }
     }
 
     private fun transformRainType(forecast: ForecastEntity): String {
@@ -123,5 +131,6 @@ class MainActivity : AppCompatActivity() {
             else -> "해당없음"
         }
     }
+
 
 }
