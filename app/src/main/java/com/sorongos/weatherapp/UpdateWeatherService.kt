@@ -46,6 +46,7 @@ class UpdateWeatherService : Service() {
             //remoteview에서 업데이트
             RemoteViews(packageName, R.layout.widget_weather).apply {
                 setTextViewText(R.id.temperatureTextView, "권한없음")
+                setTextViewText(R.id.weatherTextView,"")
                 setOnClickPendingIntent(
                     R.id.temperatureTextView,
                     pendingIntent
@@ -99,7 +100,19 @@ class UpdateWeatherService : Service() {
                         //종료
                         stopSelf()
                     },
+                    //no permission
                     failureCallback = {
+                        val pendingServiceIntent: PendingIntent =
+                            Intent(this, UpdateWeatherService::class.java)
+                                .let { intent ->
+                                    PendingIntent.getService(
+                                        this,
+                                        1,
+                                        intent,
+                                        PendingIntent.FLAG_IMMUTABLE
+                                    )
+                                }
+
                         RemoteViews(packageName, R.layout.widget_weather).apply {
                             setTextViewText(
                                 R.id.temperatureTextView,
@@ -107,7 +120,7 @@ class UpdateWeatherService : Service() {
                             )
                             setTextViewText(
                                 R.id.weatherTextView,
-                                currentForecast.weather
+                                ""
                             )
                             setOnClickPendingIntent(R.id.temperatureTextView, pendingServiceIntent)
                         }.also { remoteViews ->
