@@ -71,9 +71,26 @@ class MainActivity : AppCompatActivity() {
 
         fusedLocationClient.lastLocation
             .addOnSuccessListener { location ->
-
+                //for network
+                Thread {
+                    //geocoder can make IOException
+                    try {
+                        val addressList =
+                            Geocoder(this, Locale.KOREA).getFromLocation(
+                                location.latitude,
+                                location.longitude,
+                                1
+                            )
+                        runOnUiThread {
+                            //thoroughfare : smallest unit (동)
+                            binding.locationTextView.text =
+                                addressList?.get(0)?.thoroughfare.orEmpty()
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }.start()
                 //위경도로 내 정보 알기
-                Geocoder(this, Locale.KOREA).
 
                 Log.e("lastLocation", location.toString())
                 val retrofit = Retrofit.Builder()
@@ -135,21 +152,23 @@ class MainActivity : AppCompatActivity() {
 
                         // 정렬 후 첫번째 값은 현재 것임
                         val currentForecast = list.first()
-                        binding.temperatureTextView.text = getString(R.string.temperature_text,currentForecast.temperature)
+                        binding.temperatureTextView.text =
+                            getString(R.string.temperature_text, currentForecast.temperature)
                         binding.skyTextView.text = currentForecast.weather
-                        binding.precipitationTextView.text = getString(R.string.precipitation_text, currentForecast.precipitation)
+                        binding.precipitationTextView.text =
+                            getString(R.string.precipitation_text, currentForecast.precipitation)
 
                         //linearlayout in the scrollview
-                        binding.childForecastLayout.apply{
+                        binding.childForecastLayout.apply {
                             list.forEachIndexed { index, forecast ->
-                                if(index == 0) return@forEachIndexed
+                                if (index == 0) return@forEachIndexed
 
                                 val itemView = ItemForecastBinding.inflate(layoutInflater)
 
                                 itemView.timeTextView.text = forecast.forecastTime
                                 itemView.weatherTextView.text = forecast.weather
                                 itemView.temperatureTextView.text =
-                                    getString(R.string.temperature_text,forecast.temperature)
+                                    getString(R.string.temperature_text, forecast.temperature)
 
                                 addView(itemView.root)
                             }
