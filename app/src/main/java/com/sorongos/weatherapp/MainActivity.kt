@@ -3,6 +3,7 @@ package com.sorongos.weatherapp
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.Geocoder
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
@@ -16,11 +17,13 @@ import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
 import com.sorongos.weatherapp.databinding.ActivityMainBinding
+import com.sorongos.weatherapp.databinding.ItemForecastBinding
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.*
 import java.util.Objects.isNull
 
 class MainActivity : AppCompatActivity() {
@@ -68,6 +71,10 @@ class MainActivity : AppCompatActivity() {
 
         fusedLocationClient.lastLocation
             .addOnSuccessListener { location ->
+
+                //위경도로 내 정보 알기
+                Geocoder(this, Locale.KOREA).
+
                 Log.e("lastLocation", location.toString())
                 val retrofit = Retrofit.Builder()
                     .baseUrl("http://apis.data.go.kr/")
@@ -132,6 +139,21 @@ class MainActivity : AppCompatActivity() {
                         binding.skyTextView.text = currentForecast.weather
                         binding.precipitationTextView.text = getString(R.string.precipitation_text, currentForecast.precipitation)
 
+                        //linearlayout in the scrollview
+                        binding.childForecastLayout.apply{
+                            list.forEachIndexed { index, forecast ->
+                                if(index == 0) return@forEachIndexed
+
+                                val itemView = ItemForecastBinding.inflate(layoutInflater)
+
+                                itemView.timeTextView.text = forecast.forecastTime
+                                itemView.weatherTextView.text = forecast.weather
+                                itemView.temperatureTextView.text =
+                                    getString(R.string.temperature_text,forecast.temperature)
+
+                                addView(itemView.root)
+                            }
+                        }
                         Log.e("Forecast", forecastDateTimeMap.toString())
                     }
 
