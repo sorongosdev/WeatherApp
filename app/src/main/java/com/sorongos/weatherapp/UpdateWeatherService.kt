@@ -1,6 +1,9 @@
 package com.sorongos.weatherapp
 
 import android.Manifest
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.appwidget.AppWidgetManager
@@ -10,6 +13,7 @@ import android.content.pm.PackageManager
 import android.os.IBinder
 import android.widget.RemoteViews
 import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
 import com.google.android.gms.location.LocationServices
 
 class UpdateWeatherService : Service() {
@@ -21,7 +25,10 @@ class UpdateWeatherService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
         // notification channel
+        createChannel()
         // change to foreground service
+        startForeground(1, createNotification())
+
 
         val appWidgetManager: AppWidgetManager = AppWidgetManager.getInstance(this)
 
@@ -82,5 +89,37 @@ class UpdateWeatherService : Service() {
             }
 
         return super.onStartCommand(intent, flags, startId)
+    }
+    /**To create notification channel*/
+    private fun createChannel(){
+        val channel = NotificationChannel(
+            "widget_refresh_channel",
+            "날씨앱",
+            NotificationManager.IMPORTANCE_LOW
+        )
+
+        channel.description = "위젯을 업데이트하는 채널"
+
+        val manager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        manager.createNotificationChannel(channel)
+    }
+
+    /**create notification*/
+    private fun createNotification(): Notification{
+        return NotificationCompat.Builder(this,NOTIFICATION_CHANNEL)
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setContentTitle("날씨앱")
+            .setContentText("날씨 업데이트")
+            .build()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        //foreground service 선언시 필요
+        stopForeground(STOP_FOREGROUND_REMOVE)
+    }
+
+    companion object{
+        const val NOTIFICATION_CHANNEL = "widget_refresh_channel"
     }
 }
