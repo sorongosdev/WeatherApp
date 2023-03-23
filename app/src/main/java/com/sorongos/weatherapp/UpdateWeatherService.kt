@@ -38,6 +38,25 @@ class UpdateWeatherService : Service() {
                 Manifest.permission.ACCESS_BACKGROUND_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
+            //권한이 없을 때는 setting activity로
+            val pendingIntent: PendingIntent = Intent(this, SettingActivity::class.java).let {
+                PendingIntent.getActivity(this, 2, it, PendingIntent.FLAG_IMMUTABLE)
+            }
+
+            //remoteview에서 업데이트
+            RemoteViews(packageName, R.layout.widget_weather).apply {
+                setTextViewText(R.id.temperatureTextView, "권한없음")
+                setOnClickPendingIntent(
+                    R.id.temperatureTextView,
+                    pendingIntent
+                ) //to setting activity
+            }.also { remoteViews ->
+                val appWidgetName = ComponentName(this, WeatherAppWidgetProvider::class.java)
+                appWidgetManager.updateAppWidget(appWidgetName, remoteViews)
+            }
+
+            stopSelf()
+
             //todo 위젯을 권한없음 형태로 표시, 클릭했을 때 권한 팝업을 얻을 수 있도록
             return super.onStartCommand(intent, flags, startId)
         }
@@ -81,8 +100,21 @@ class UpdateWeatherService : Service() {
                         stopSelf()
                     },
                     failureCallback = {
-                        //todo 위젯을 에러 상태로 표시
-                        //종료
+                        RemoteViews(packageName, R.layout.widget_weather).apply {
+                            setTextViewText(
+                                R.id.temperatureTextView,
+                                "error"
+                            )
+                            setTextViewText(
+                                R.id.weatherTextView,
+                                currentForecast.weather
+                            )
+                            setOnClickPendingIntent(R.id.temperatureTextView, pendingServiceIntent)
+                        }.also { remoteViews ->
+                            val appWidgetName =
+                                ComponentName(this, WeatherAppWidgetProvider::class.java)
+                            appWidgetManager.updateAppWidget(appWidgetName, remoteViews)
+                        }
                         stopSelf()
                     }
                 )
@@ -90,8 +122,9 @@ class UpdateWeatherService : Service() {
 
         return super.onStartCommand(intent, flags, startId)
     }
+
     /**To create notification channel*/
-    private fun createChannel(){
+    private fun createChannel() {
         val channel = NotificationChannel(
             "widget_refresh_channel",
             "날씨앱",
@@ -105,8 +138,8 @@ class UpdateWeatherService : Service() {
     }
 
     /**create notification*/
-    private fun createNotification(): Notification{
-        return NotificationCompat.Builder(this,NOTIFICATION_CHANNEL)
+    private fun createNotification(): Notification {
+        return NotificationCompat.Builder(this, NOTIFICATION_CHANNEL)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentTitle("날씨앱")
             .setContentText("날씨 업데이트")
@@ -119,7 +152,7 @@ class UpdateWeatherService : Service() {
         stopForeground(STOP_FOREGROUND_REMOVE)
     }
 
-    companion object{
+    companion object {
         const val NOTIFICATION_CHANNEL = "widget_refresh_channel"
     }
 }
