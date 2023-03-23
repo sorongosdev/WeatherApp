@@ -6,12 +6,26 @@
     tools:layout_height="40dp"
     android:orientation="vertical"
     android:gravity="center"
+    android:background="@drawable/weather_widget_background"
     android:layout_height="match_parent">
+    <TextView
+        android:textColor="@color/white"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/temperatureTextView"
+        android:text="초기화"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        tools:text="-10"
+        />
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/testTextView"
-        android:text="test"
+        android:id="@+id/weatherTextView"
+        android:text=""
+        tools:text="맑음"
+        android:textSize="10sp"
+        android:textColor="@color/white"
         />
 
 </LinearLayout>
