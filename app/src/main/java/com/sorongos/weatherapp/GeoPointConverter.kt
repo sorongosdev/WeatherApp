@@ -4,6 +4,7 @@ import android.util.Log
 import java.lang.Math.pow
 import kotlin.math.*
 
+/**nx ny를 위경도로 바꿔주는 클래스*/
 class GeoPointConverter {
 
     //    map.Re = 6371.00877; // 지도반경

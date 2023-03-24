@@ -2,6 +2,7 @@ package com.sorongos.weatherapp
 
 import com.google.gson.annotations.SerializedName
 
+/**원하는 카테고리만 받음, 다른 형태는 모두 null*/
 enum class Category {
     @SerializedName("POP")
     POP, //강수확률

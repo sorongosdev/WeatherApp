@@ -16,6 +16,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import com.google.android.gms.location.LocationServices
 
+/**위젯 클릭시 업데이트, notification channel과 notification을 생성*/
 class UpdateWeatherService : Service() {
     override fun onBind(intent: Intent?): IBinder? {
         return null

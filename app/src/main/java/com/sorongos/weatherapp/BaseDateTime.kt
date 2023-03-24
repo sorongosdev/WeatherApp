@@ -3,6 +3,7 @@ package com.sorongos.weatherapp
 import java.time.LocalDateTime
 import java.time.LocalTime
 
+/**기준이 되는 시간을 설정, 3시간마다 날씨가 업데이트 되기 때문.*/
 data class BaseDateTime(
     val baseDate: String,
     val baseTime: String

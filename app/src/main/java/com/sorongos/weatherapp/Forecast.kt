@@ -1,5 +1,6 @@
 package com.sorongos.weatherapp
 
+/**서버에서 데이터를 불러온 후, 우리가 보는 형식*/
 data class Forecast(
     val forecastDate: String,
     val forecastTime: String,

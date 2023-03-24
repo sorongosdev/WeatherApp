@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.sorongos.weatherapp.databinding.ActivitySettingBinding
 
+/**위치 권한이 없을 때 설정으로 이동*/
 class SettingActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySettingBinding
     private val locationPermissionRequest = registerForActivityResult(

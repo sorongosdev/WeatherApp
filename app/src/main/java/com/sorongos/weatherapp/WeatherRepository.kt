@@ -8,7 +8,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-/**서비스에서 데이터를 가져오는 중간 클래스*/
+/**서비스에서 데이터를 가져오는 중간 클래스, 레트로핏 이용*/
 object WeatherRepository {
     val retrofit = Retrofit.Builder()
         .baseUrl("http://apis.data.go.kr/")
