@@ -6,4 +6,7 @@
 
 ## 키워드
 - retrofit & gson converter
-- 날씨 api
+- 공공데이터 날씨 api
+- 어렴풋한 사용자 위치
+- widgetProvider을 통한 위젯 생성
+- foreground service & notification
